@@ -3,7 +3,7 @@ import type { Session } from 'next-auth';
 import { NextResponse } from 'next/server';
 
 // Paths that require an active Auth.js session with the operator role.
-const PROTECTED = ['/launch', '/api/session'];
+const PROTECTED = ['/ops/launch', '/ops/api/session'];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -13,10 +13,8 @@ export default auth((req) => {
 
   const session = req.auth as (Session & { roles?: string[] }) | null;
   if (session == null) {
-    // Clone nextUrl (a basePath-aware NextURL) so the `/_ops` prefix is
-    // re-applied automatically; `new URL('/login', req.url)` would drop it.
     const loginUrl = req.nextUrl.clone();
-    loginUrl.pathname = '/login';
+    loginUrl.pathname = '/ops/login';
     loginUrl.search = '';
     return NextResponse.redirect(loginUrl);
   }
@@ -33,5 +31,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ['/launch', '/api/session'],
+  matcher: ['/ops/launch', '/ops/api/session'],
 };

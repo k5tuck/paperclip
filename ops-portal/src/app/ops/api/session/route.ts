@@ -54,10 +54,8 @@ export async function GET(): Promise<NextResponse> {
     return response;
   } catch (err) {
     if (err instanceof SessionInvalidError) {
-      // Absolute URL incl. the `/_ops` basePath — NextResponse.redirect does
-      // not auto-prepend basePath the way next/navigation redirect() does.
       return NextResponse.redirect(
-        process.env['LOGIN_URL'] ?? 'https://ops.torinagi.com/_ops/login',
+        process.env['LOGIN_URL'] ?? 'https://ops.torinagi.com/ops/login',
         { status: 302 }
       );
     }

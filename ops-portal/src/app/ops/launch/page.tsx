@@ -1,10 +1,8 @@
 // This page is the post-login landing.  The middleware guarantees the user is
 // authenticated and has the operator role before they get here.
 //
-// It immediately calls /_ops/api/session to mint the Caddy JWT and redirect
-// to the app root (`/`), which the proxy forwards to the paperclip backend.
-// NOTE: these are raw client-side URLs, so they must include the `/_ops`
-// basePath explicitly (Next only auto-prefixes <Link>/router/redirect()).
+// It immediately calls /ops/api/session to mint the Caddy JWT and redirect to
+// the app root (`/`), which the proxy forwards to the paperclip backend.
 // Using a meta refresh as a fallback in case JS is off.
 export const metadata = { title: 'Launching — Jaban Universe' };
 
@@ -12,7 +10,7 @@ export default function LaunchPage() {
   return (
     <>
       {/* Instant redirect via meta refresh (no-JS fallback) */}
-      <meta httpEquiv="refresh" content="0;url=/_ops/api/session" />
+      <meta httpEquiv="refresh" content="0;url=/ops/api/session" />
 
       <main className="min-h-full flex items-center justify-center">
         <div className="text-center flex flex-col gap-4">
@@ -25,7 +23,7 @@ export default function LaunchPage() {
           {/* JS redirect */}
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.location.href = '/_ops/api/session';`,
+              __html: `window.location.href = '/ops/api/session';`,
             }}
           />
         </div>

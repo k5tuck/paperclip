@@ -6,11 +6,12 @@ const nextConfig = {
   // network. Standalone output is incompatible with a custom server.
   //
   // The portal shares one public origin (ops.torinagi.com) with the proxied
-  // paperclip app, so every portal route is namespaced under `/_ops` to avoid
-  // colliding with the backend's own `/`, `/api/*`, and asset paths. This
-  // MUST stay in sync with PORTAL_BASE in server.js and the Zitadel callback
-  // redirect URI (`/_ops/api/auth/callback/zitadel`).
-  basePath: '/_ops',
+  // paperclip app. Rather than Next's `basePath` (which strips the prefix
+  // before route handlers run, breaking Auth.js's action parsing), the portal
+  // lives under a real `/ops` route segment (see src/app/ops/**). server.js
+  // routes `/ops` + `/_next` to Next and everything else to the backend, so
+  // the portal never collides with the backend's `/`, `/api/auth` (better-auth),
+  // and `/assets/*` (Vite) paths.
   async headers() {
     return [
       {

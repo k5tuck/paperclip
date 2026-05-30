@@ -4,9 +4,9 @@
  * Architecture: the ops-portal is the single public entry point
  * (https://ops.torinagi.com). It does two jobs on one origin:
  *
- *   1. Auth portal — Next.js owns everything under the `/_ops` base path
- *      (login, the Zitadel OIDC callback, the Caddy-JWT minting endpoint).
- *      See `basePath: '/_ops'` in next.config.mjs.
+ *   1. Auth portal — Next.js owns everything under the `/ops` route segment
+ *      (login, the Zitadel OIDC callback, the Caddy-JWT minting endpoint),
+ *      plus its `/_next/*` assets. See src/app/ops/**.
  *
  *   2. Reverse proxy — every OTHER path is proxied over Railway's private
  *      network to the paperclip backend (`paperclip.railway.internal:8080`,
@@ -29,13 +29,19 @@ const HOST = '0.0.0.0';
 // Where the backend (paperclip) Caddy listens on the Railway private network.
 const BACKEND = process.env.BACKEND_INTERNAL_URL || 'http://paperclip.railway.internal:8080';
 
-// Everything the Next portal owns lives under this prefix (matches
-// next.config.mjs `basePath`). Keep in sync.
-const PORTAL_BASE = '/_ops';
-
+// Paths the Next portal owns: the `/ops` route segment (pages, OIDC callback,
+// session-mint endpoint) and Next's `/_next/*` build assets. Everything else
+// is proxied to the paperclip backend. The backend is a Vite SPA (assets under
+// `/assets/*`) so `/_next` never collides.
 function isPortalPath(url) {
   if (!url) return false;
-  return url === PORTAL_BASE || url.startsWith(PORTAL_BASE + '/') || url.startsWith(PORTAL_BASE + '?');
+  const path = url.split('?')[0];
+  return (
+    path === '/ops' ||
+    path.startsWith('/ops/') ||
+    path === '/_next' ||
+    path.startsWith('/_next/')
+  );
 }
 
 const app = next({ dev: false });
@@ -84,7 +90,7 @@ app.prepare().then(() => {
 
   server.listen(PORT, HOST, () => {
     console.log(
-      `[ops-portal] listening on ${HOST}:${PORT} — portal base ${PORTAL_BASE}, proxy target ${BACKEND}`
+      `[ops-portal] listening on ${HOST}:${PORT} — portal at /ops + /_next, proxy target ${BACKEND}`
     );
   });
 });

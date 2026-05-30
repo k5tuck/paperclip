@@ -120,18 +120,18 @@ const authConfig: NextAuthConfig = {
     maxAge: 8 * 60 * 60, // 8 hours
   },
 
-  // NextAuth resolves these against the AUTH_URL origin and does not prepend
-  // Next's basePath, so include `/_ops` explicitly.
   pages: {
-    signIn: '/_ops/login',
-    error: '/_ops/login',
+    signIn: '/ops/login',
+    error: '/ops/login',
   },
 
-  // The OIDC endpoints live under the Next basePath. AUTH_URL is set to
-  // `https://ops.torinagi.com/_ops/api/auth` in the deployment so NextAuth
-  // builds the correct callback/redirect URLs; basePath here keeps local
-  // builds consistent if AUTH_URL is unset.
-  basePath: '/_ops/api/auth',
+  // The portal lives under the `/ops` route segment (no Next basePath), so the
+  // OIDC endpoints are served at `/ops/api/auth/*`. Setting basePath here makes
+  // Auth.js parse the action correctly (request path retains `/ops/api/auth`)
+  // and generate callback/redirect URLs as `/ops/api/auth/...`. AUTH_URL is set
+  // to `https://ops.torinagi.com/ops/api/auth` in the deployment to pin the
+  // origin; the two must agree.
+  basePath: '/ops/api/auth',
 
   trustHost: true,
 };
