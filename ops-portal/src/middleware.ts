@@ -13,7 +13,11 @@ export default auth((req) => {
 
   const session = req.auth as (Session & { roles?: string[] }) | null;
   if (session == null) {
-    const loginUrl = new URL('/login', req.url);
+    // Clone nextUrl (a basePath-aware NextURL) so the `/_ops` prefix is
+    // re-applied automatically; `new URL('/login', req.url)` would drop it.
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    loginUrl.search = '';
     return NextResponse.redirect(loginUrl);
   }
 

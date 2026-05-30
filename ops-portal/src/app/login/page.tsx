@@ -79,7 +79,9 @@ export default async function LoginPage({
             <form
               action={async () => {
                 'use server';
-                await signIn('zitadel', { redirectTo: '/launch' });
+                // NextAuth resolves redirectTo against the AUTH_URL origin and
+                // is unaware of Next's basePath, so include `/_ops` explicitly.
+                await signIn('zitadel', { redirectTo: '/_ops/launch' });
               }}
             >
               <button
