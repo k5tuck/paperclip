@@ -46,7 +46,7 @@ export default async function LoginPage({
 }) {
   const session = await auth();
   if (session?.user != null) {
-    redirect('/launch');
+    redirect('/ops/launch');
   }
 
   const params = await searchParams;
@@ -79,7 +79,7 @@ export default async function LoginPage({
             <form
               action={async () => {
                 'use server';
-                await signIn('zitadel', { redirectTo: '/launch' });
+                await signIn('zitadel', { redirectTo: '/ops/launch' });
               }}
             >
               <button

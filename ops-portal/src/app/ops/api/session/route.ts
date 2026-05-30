@@ -7,11 +7,16 @@ import { AuthProxyError, OIDCConfigurationError, SessionInvalidError } from '@/l
 // Zitadel session.  It:
 //   1. Validates the Auth.js session and checks the operator role.
 //   2. Mints a short-lived JWT for Caddy using the shared secret.
-//   3. Sets the JWT as an HttpOnly cookie on .binelek.io.
-//   4. Redirects the browser to app.ops.binelek.io.
+//   3. Sets the JWT as an HttpOnly cookie on .torinagi.com.
+//   4. Redirects the browser to the app root (`/`), which the ops-portal's
+//      reverse proxy forwards over the private network to the paperclip
+//      backend. The cookie is sent with that request, so the backend Caddy
+//      validates it and serves the app.
 
+// The app lives at the portal's own origin root now (the portal proxies `/`
+// to the internal backend). Override with APP_URL if the entry path differs.
 const APP_URL =
-  process.env['APP_URL'] ?? 'https://app.ops.torinagi.com';
+  process.env['APP_URL'] ?? 'https://ops.torinagi.com/';
 
 // Cookie domain follows wherever the auth portal lives so the
 // jaban_session cookie is readable by the matching `app.ops.*` host.
@@ -50,7 +55,7 @@ export async function GET(): Promise<NextResponse> {
   } catch (err) {
     if (err instanceof SessionInvalidError) {
       return NextResponse.redirect(
-        new URL('/login', process.env['NEXTAUTH_URL'] ?? 'https://ops.torinagi.com'),
+        process.env['LOGIN_URL'] ?? 'https://ops.torinagi.com/ops/login',
         { status: 302 }
       );
     }
